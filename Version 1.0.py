@@ -6,7 +6,7 @@ from termcolor import colored, cprint
 winsound.Beep(2500,100)
 winsound.Beep(2500,100)
 cprint("WELCOME",color='cyan',attrs=['bold','dark'], file=sys.stderr)
-cprint("Object Shortening System initializing...",color='magenta',attrs=['bold'], file=sys.stderr)
+cprint("Object Delivery  System initializing...",color='magenta',attrs=['bold'], file=sys.stderr)
 
 winsound.Beep(2500,100)
 winsound.Beep(2500,100)
