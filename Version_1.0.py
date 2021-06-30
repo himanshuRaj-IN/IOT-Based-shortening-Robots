@@ -4,9 +4,11 @@ E-mail : himanshuraj9194@gmail.com
 
 """
 #-------------------------------------------------------------------------------------
-from time import sleep
+from time import *
 from collections import defaultdict
 from heapq import *
+import urllib.request
+import json
 #-------------------------------------------------------------------------------------
 def listToString(s):
     # initialize an empty string
@@ -63,10 +65,77 @@ def dijkstra(edges, f, t):
     return float("inf"), None
 
 make_path = lambda tup: (*make_path(tup[1]), tup[0]) if tup else ()
-out = dijkstra(edges, "S","5")
-path = make_path(out[1])
-print(path)
-print(listToString(path))
-print(out)
+
+# test internet
 
 
+
+def internet_on():
+   try:
+        response = urllib.request.urlopen('https://www.google.com/', timeout=10)
+        return True
+   except:
+        return False
+
+class bot:
+    def __init__(self,channel,read, write):
+        # Instance Variable
+        self.channelID=channel
+        self.readapi = read
+        self.writeapi = write
+
+    def read_data(self,):
+        conn = urllib.request.urlopen("http://api.thingspeak.com/channels/%s/feeds/last.json?api_key=%s" % (self.channelID,self.readapi))
+        response = conn.read()
+        data = json.loads(response)
+        conn.close()
+        return data
+
+    def online_status(self, ):
+        data=self.read_data()
+        self.online_status = data['field1'] # field one is reserved for the online status
+        if self.online_status == '1':
+            return True
+        else:
+            return False
+    def working_status(self, ):
+        data=self.read_data()
+        self.working_status = data['field2']  # field one is reserved for the working  status
+        if self.working_status == '1':
+            return True
+        else:
+            return False
+
+    def send_data(self,field_no,data):
+        URL=f"https://api.thingspeak.com/update?api_key={self.writeapi}&field{field_no}={data}"
+        i=0
+        while i<5: # try 5 times to upload data and try to confirm it
+            i=i+1
+            print("inloop")
+            conn = urllib.request.urlopen(URL)
+            rdata = self.read_data()
+            field_check = f"field{field_no}"
+            rdata = rdata[field_check]
+            print(rdata)
+            if data==rdata:
+                break
+            conn.close()
+
+
+
+
+if __name__ == '__main__':
+
+    print("--------------------------------------")
+    print("--------------------------------------")
+    print("Testing internet connection.....")
+    if internet_on() is True:
+        print( "Internet Status : CONNECTED")
+    else:
+        print( "Internet Status : Timeout Error....")
+        exit()
+
+    robot1 = bot(992542,"6H04VKZX0H5UPLMI","8KTZAG0KKO18M9IV")
+    robot2 = bot(1420145, "42N515LBCG37FJNQ","S2DNEV8HEBHFE3XV")
+    print(robot1.writeapi)
+    print(robot2.send_data(2,"145145829"))
