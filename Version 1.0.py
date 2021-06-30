@@ -36,7 +36,7 @@ data_class_name=''
 #.....................................................................
 time.sleep(0.4)
 cprint("\nCommunicating with the Arduino UNO Throgh COM[15] PORT....",color='magenta',attrs=['bold'], file=sys.stderr)
-arduino=serial.serial('COM15',9600,timeout=1)                     # Connecting Arduino UNO as arduino
+arduino=serial.serial('COM08',9600,timeout=1)                     # Connecting Arduino UNO as arduino
 time.sleep(1)                                                     # To stable the communication
 for i in tqdm (range (100), desc="Connecting "):
     pass

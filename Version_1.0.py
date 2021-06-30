@@ -9,6 +9,16 @@ from collections import defaultdict
 from heapq import *
 import urllib.request
 import json
+from pandas import *
+# /////////////////////
+import cv2
+import numpy as np
+from pyzbar.pyzbar import decode
+import serial
+import threading
+from tqdm import tqdm
+import sys
+from termcolor import colored, cprint
 #-------------------------------------------------------------------------------------
 def listToString(s):
     # initialize an empty string
@@ -23,7 +33,7 @@ def listToString(s):
 
 # Shortest Path Algorithm
 
-# Nodes Data ( Weighted Node Graph
+# Nodes Data ( Weighted Node Graph)
 edges = [
 #       {{Node_1 } ,{Node_2},{Distance between Them}}
         ("S", "1", 10),
@@ -76,6 +86,17 @@ def internet_on():
         return True
    except:
         return False
+dict={}
+def update_qr_database():
+    xls = ExcelFile('pincode.xls')
+    df = xls.parse(xls.sheet_names[0])
+    print(df)
+    global dict
+    dict = df.set_index('id')['value'].to_dict()
+
+
+
+
 
 class bot:
     def __init__(self,channel,read, write):
@@ -137,5 +158,3 @@ if __name__ == '__main__':
 
     robot1 = bot(992542,"6H04VKZX0H5UPLMI","8KTZAG0KKO18M9IV")
     robot2 = bot(1420145, "42N515LBCG37FJNQ","S2DNEV8HEBHFE3XV")
-    print(robot1.writeapi)
-    print(robot2.send_data(2,"145145829"))
