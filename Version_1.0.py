@@ -34,27 +34,26 @@ def listToString(s):
 # Shortest Path Algorithm
 
 # Nodes Data ( Weighted Node Graph)
-edges = [
-#       {{Node_1 } ,{Node_2},{Distance between Them}}
-        ("S", "1", 10),
-        ("1", "2", 10),
-        ("1", "7", 20),
-        ("2", "5", 5),
-        ("2", "3", 5),
-        ("3", "4", 12),
-        ("4", "E", 5),
-        ("5", "6", 12),
-        ("6", "7", 8),
-        ("6", "4", 10),
-        # ("F", "G", 11)
-                        ]
+# edges = [
+# #       {{Node_1 } ,{Node_2},{Distance between Them}}
+#         ("S", "1", 10),
+#         ("1", "2", 10),
+#         ("1", "7", 20),
+#         ("2", "5", 5),
+#         ("2", "3", 5),
+#         ("3", "4", 12),
+#         ("4", "E", 5),
+#         ("5", "6", 12),
+#         ("6", "7", 8),
+#         ("6", "4", 10),
+#         # ("F", "G", 11)
+#                         ]
 
 
 def dijkstra(edges, f, t):
-    g = defaultdict(set)
-    for l, r, c in edges:
-        g[l].add((c, r))
-        g[r].add((c, l))
+    g = defaultdict(list)
+    for l,r,c in edges:
+        g[l].append((c,r))
 
     q, seen, mins = [(0,f,())], set(), {f: 0}
     while q:
@@ -74,7 +73,8 @@ def dijkstra(edges, f, t):
 
     return float("inf"), None
 
-make_path = lambda tup: (*make_path(tup[1]), tup[0]) if tup else ()
+
+
 
 # test internet
 
@@ -86,17 +86,21 @@ def internet_on():
         return True
    except:
         return False
-dict={}
+
 def update_qr_database():
     xls = ExcelFile('pincode.xls')
     df = xls.parse(xls.sheet_names[0])
-    print(df)
     global dict
     dict = df.set_index('id')['value'].to_dict()
+    return df
 
+def search_in_dict(search):
+    global dict
+    if search in list(dict.keys()):
 
-
-
+        return True
+    else:
+        return False
 
 class bot:
     def __init__(self,channel,read, write):
@@ -147,6 +151,22 @@ class bot:
 
 if __name__ == '__main__':
 
+    # --------------VARIABLES----------------------
+    edges = [
+        ("A", "B", 7),
+        ("A", "D", 5),
+        ("B", "C", 8),
+        ("B", "D", 9),
+        ("B", "E", 7),
+        ("C", "E", 5),
+        ("D", "E", 15),
+        ("D", "F", 6),
+        ("E", "F", 8),
+        ("E", "G", 9),
+        ("F", "G", 11)
+    ]
+    dict = {}
+    #-----------------------------------------------
     print("--------------------------------------")
     print("--------------------------------------")
     print("Testing internet connection.....")
@@ -155,6 +175,57 @@ if __name__ == '__main__':
     else:
         print( "Internet Status : Timeout Error....")
         exit()
-
+    # initialising robots objects
     robot1 = bot(992542,"6H04VKZX0H5UPLMI","8KTZAG0KKO18M9IV")
     robot2 = bot(1420145, "42N515LBCG37FJNQ","S2DNEV8HEBHFE3XV")
+    # importing data from excel sheet make  dictonary
+    print(update_qr_database())
+
+    # initilizing loop of work
+    cap = cv2.VideoCapture(0) # open camera
+    while True:
+        success, img= cap.read()
+        for barcode in decode(img):
+            Data_in_qr = barcode.data.decode('utf-8')
+            myColor = (0, 0, 255)
+            pts = np.array([barcode.polygon], np.int32)
+            pts = pts.reshape((-1, 1, 2))
+            cv2.polylines(img, [pts], True, myColor, 2)
+            pts2 = barcode.rect
+            cv2.putText(img, Data_in_qr, (pts2[0], pts2[1]), cv2.FONT_HERSHEY_SIMPLEX,0.9, myColor, 2)
+            y = 65
+            x = 0
+            h = 350
+            w = 1100
+            img = img[y:y + h, x:x + w]
+            winname="Recagnised Qr "
+            cv2.namedWindow(winname)  # Create a named window
+            cv2.moveWindow(winname, 0,380)  # Move it to (40,30)
+            cv2.imshow(winname, img)
+            cv2.waitKey(1000)
+            cv2.destroyAllWindows()
+
+#           Matching data with Our data base
+            Data_in_qr=int(Data_in_qr) # typecasting
+
+            if search_in_dict(Data_in_qr) is True:
+                target_node=dict[Data_in_qr]
+
+            else:
+                print("Not Found in Our Database ")
+                print("Enter Manually Valid Targetd Node of For exit for next Enter ' E '")
+                target_node=input()
+                if target_node == 'E':
+                    continue
+
+#           Applying shortest path Algorithm
+            start_node="A"
+            targeted_node =target_node
+            print(start_node,target_node)
+            print(type(start_node), type(target_node))
+
+            go_shortest_path =(dijkstra(edges,start_node,target_node))
+            make_path = lambda tup: (*make_path(tup[1]), tup[0]) if tup else ()
+            go_shortest_path=make_path(go_shortest_path[1])
+            go_shortest_path=listToString(go_shortest_path)
+            print(go_shortest_path)
