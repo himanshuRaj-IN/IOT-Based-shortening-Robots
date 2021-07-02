@@ -30,6 +30,11 @@ def listToString(s):
 
         # return string
     return str1
+def reverse(s):
+  str = ""
+  for i in s:
+    str = i + str
+  return str
 
 # Shortest Path Algorithm
 
@@ -54,6 +59,7 @@ def dijkstra(edges, f, t):
     g = defaultdict(list)
     for l,r,c in edges:
         g[l].append((c,r))
+        g[r].append((c, l))
 
     q, seen, mins = [(0,f,())], set(), {f: 0}
     while q:
@@ -103,8 +109,10 @@ def search_in_dict(search):
         return False
 
 class bot:
+
+
     def __init__(self,channel,read, write):
-        # Instance Variable
+
         self.channelID=channel
         self.readapi = read
         self.writeapi = write
@@ -124,6 +132,7 @@ class bot:
         else:
             return False
     def working_status(self, ):
+        """ Returns true when bot is ready to take work if not return false """
         data=self.read_data()
         self.working_status = data['field2']  # field one is reserved for the working  status
         if self.working_status == '1':
@@ -153,17 +162,17 @@ if __name__ == '__main__':
 
     # --------------VARIABLES----------------------
     edges = [
-        ("A", "B", 7),
-        ("A", "D", 5),
-        ("B", "C", 8),
-        ("B", "D", 9),
-        ("B", "E", 7),
-        ("C", "E", 5),
-        ("D", "E", 15),
-        ("D", "F", 6),
-        ("E", "F", 8),
-        ("E", "G", 9),
-        ("F", "G", 11)
+        ("A", "B", 5),
+        ("A", "H", 10),
+        ("B", "C", 5),
+        ("B", "E", 5),
+        ("C", "D", 5),
+        ("D", "E", 5),
+        ("D", "F", 5),
+        ("E", "G", 5),
+        ("F", "G", 5),
+        ("G", "H", 5),
+        # ("", "G", 11)
     ]
     dict = {}
     #-----------------------------------------------
@@ -213,19 +222,49 @@ if __name__ == '__main__':
 
             else:
                 print("Not Found in Our Database ")
-                print("Enter Manually Valid Targetd Node of For exit for next Enter ' E '")
+                print("Enter Manually Valid Targetd Node of For exit for next Enter ' e '")
                 target_node=input()
-                if target_node == 'E':
+                if target_node == 'e':
                     continue
 
 #           Applying shortest path Algorithm
             start_node="A"
             targeted_node =target_node
-            print(start_node,target_node)
-            print(type(start_node), type(target_node))
+            # print(start_node,target_node)
+            # print(type(start_node), type(target_node))
 
-            go_shortest_path =(dijkstra(edges,start_node,target_node))
+            go_shortest_path =dijkstra(edges,start_node,targeted_node)
             make_path = lambda tup: (*make_path(tup[1]), tup[0]) if tup else ()
             go_shortest_path=make_path(go_shortest_path[1])
             go_shortest_path=listToString(go_shortest_path)
-            print(go_shortest_path)
+            print(f"Going shortest path : {go_shortest_path}")
+
+
+            return_shortest_path=dijkstra(edges,targeted_node,"H")
+            make_path2 = lambda tup: (*make_path(tup[1]), tup[0]) if tup else ()
+            return_shortest_path=make_path2(return_shortest_path[1])
+            return_shortest_path=listToString(return_shortest_path)
+            print(f"Return Shortest path : {return_shortest_path}")
+
+        # checking for available bot to do this work
+        #
+        #     if robot1.online_status() is True:
+        #         if robot1.working_status() is True:
+        #             robot1.send_data(3,go_shortest_path)
+        #             sleep(2)
+        #             robot1.send_data(4,return_shortest_path)
+        #
+        #             print("Work assigned to Robot 1")
+        #
+        #     elif robot2.online_status() is True:
+        #         if robot2.working_status() is True:
+        #             robot2.send_data(3,go_shortest_path)
+        #             sleep(2)
+        #             robot2.send_data(4,return_shortest_path)
+        #
+        #             print("Work assigned to Robot 2")
+        #     else:
+        #         print("Opps No one available try again")
+
+            update_qr_database()
+
