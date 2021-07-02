@@ -11,4 +11,4 @@ def listToString(s):
         # return string
     return str1
 if __name__ == "__main__":
-    direction dict={"AB"}
+    pass
